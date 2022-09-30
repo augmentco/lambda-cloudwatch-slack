@@ -38,7 +38,7 @@ var postMessage = function(message, callback) {
   postReq.write(body);
   postReq.end();
 };
-
+/*
 var handleElasticBeanstalk = function(event, context) {
   var timestamp = (new Date(event.Records[0].Sns.Timestamp)).getTime()/1000;
   var subject = event.Records[0].Sns.Subject || "AWS Elastic Beanstalk Notification";
@@ -226,7 +226,7 @@ var handleElasticache = function(event, context) {
   };
   return _.merge(slackMessage, baseSlackMessage);
 };
-
+*/
 var handleCloudWatch = function(event, context) {
   var timestamp = (new Date(event.Records[0].Sns.Timestamp)).getTime()/1000;
   var message = JSON.parse(event.Records[0].Sns.Message);
@@ -279,7 +279,7 @@ var handleCloudWatch = function(event, context) {
   };
   return _.merge(slackMessage, baseSlackMessage);
 };
-
+/*
 var handleAutoScaling = function(event, context) {
   var subject = "AWS AutoScaling Notification"
   var message = JSON.parse(event.Records[0].Sns.Message);
@@ -352,10 +352,11 @@ var handleCatchAll = function(event, context) {
 
   return _.merge(slackMessage, baseSlackMessage);
 }
-
+*/
 var processEvent = function(event, context) {
   console.log("sns received:" + JSON.stringify(event, null, 2));
-  var slackMessage = null;
+/*
+    var slackMessage = null;
   var eventSubscriptionArn = event.Records[0].EventSubscriptionArn;
   var eventSnsSubject = event.Records[0].Sns.Subject || 'no subject';
   var eventSnsMessageRaw = event.Records[0].Sns.Message;
@@ -364,7 +365,7 @@ var processEvent = function(event, context) {
   try {
     eventSnsMessage = JSON.parse(eventSnsMessageRaw);
   }
-  catch (e) {    
+  catch (e) {
   }
 
   if(eventSubscriptionArn.indexOf(config.services.codepipeline.match_text) > -1 || eventSnsSubject.indexOf(config.services.codepipeline.match_text) > -1 || eventSnsMessageRaw.indexOf(config.services.codepipeline.match_text) > -1){
@@ -377,7 +378,9 @@ var processEvent = function(event, context) {
   }
   else if(eventSnsMessage && 'AlarmName' in eventSnsMessage && 'AlarmDescription' in eventSnsMessage){
     console.log("processing cloudwatch notification");
+*/
     slackMessage = handleCloudWatch(event,context);
+    /*
   }
   else if(eventSubscriptionArn.indexOf(config.services.codedeploy.match_text) > -1 || eventSnsSubject.indexOf(config.services.codedeploy.match_text) > -1 || eventSnsMessageRaw.indexOf(config.services.codedeploy.match_text) > -1){
     console.log("processing codedeploy notification");
@@ -394,7 +397,7 @@ var processEvent = function(event, context) {
   else{
     slackMessage = handleCatchAll(event, context);
   }
-
+*/
   postMessage(slackMessage, function(response) {
     if (response.statusCode < 400) {
       console.info('message posted successfully');
