@@ -228,7 +228,7 @@ var handleElasticache = function(event, context) {
 };
 */
 var handleCloudWatch = function(event, context) {
-  var subject   = "AWS CloudWatch Notification";
+  var subject   = "CloudWatch";
   var timestamp = (new Date(event.time)).getTime()/1000;
   var region    = event.region;
   var reason    = event.detail.state.reason;
@@ -254,14 +254,14 @@ var handleCloudWatch = function(event, context) {
         "color": color,
         "fields": [
           { "title": "Alarm Name", "value": alarmName, "short": true },
-          { "title": "Alarm Description", "value": alarmDescription, "short": false},
+          //{ "title": "Alarm Description", "value": alarmDescription, "short": false},
           {
-            "title": "Trigger",
+            "title": "Reason",
             "value": reason,
               "short": false
           },
           { "title": "Old State", "value": oldState, "short": true },
-          { "title": "Current State", "value": newState, "short": true },
+          { "title": "New State", "value": newState, "short": true },
           {
             "title": "Link to Alarm",
             "value": "https://console.aws.amazon.com/cloudwatch/home?region=" + region + "#alarm:alarmFilter=ANY;name=" + encodeURIComponent(alarmName),
