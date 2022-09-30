@@ -228,22 +228,22 @@ var handleElasticache = function(event, context) {
 };
 */
 var handleCloudWatch = function(event, context) {
-  var timestamp = (new Date(event.Records[0].Sns.Timestamp)).getTime()/1000;
-  var message = JSON.parse(event.Records[0].Sns.Message);
-  var region = event.Records[0].EventSubscriptionArn.split(":")[3];
-  var subject = "AWS CloudWatch Notification";
-  var alarmName = message.AlarmName;
-  var metricName = message.Trigger.MetricName;
-  var oldState = message.OldStateValue;
-  var newState = message.NewStateValue;
-  var alarmDescription = message.AlarmDescription;
-  var alarmReason = message.NewStateReason;
-  var trigger = message.Trigger;
+  var subject   = "AWS CloudWatch Notification";
+  var timestamp = (new Date(event.time)).getTime()/1000;
+  var region    = event.region;
+  var reason    = event.detail.state.reason;
+  var oldState  = event.detail.previousState.value;
+  var newState  = event.detail.state.value;
+
+  var alarmName        = event.detail.alarmName;
+  var alarmDescription = "";
+  try { alarmDescription = event.detail.alarmDescription; } catch (e) { }
+
   var color = "warning";
 
-  if (message.NewStateValue === "ALARM") {
+  if (newState === "ALARM") {
       color = "danger";
-  } else if (message.NewStateValue === "OK") {
+  } else if (newState === "OK") {
       color = "good";
   }
 
@@ -257,12 +257,7 @@ var handleCloudWatch = function(event, context) {
           { "title": "Alarm Description", "value": alarmDescription, "short": false},
           {
             "title": "Trigger",
-            "value": trigger.Statistic + " "
-              + metricName + " "
-              + trigger.ComparisonOperator + " "
-              + trigger.Threshold + " for "
-              + trigger.EvaluationPeriods + " period(s) of "
-              + trigger.Period + " seconds.",
+            "value": reason,
               "short": false
           },
           { "title": "Old State", "value": oldState, "short": true },
