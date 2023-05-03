@@ -226,6 +226,56 @@ var handleElasticache = function(event, context) {
   };
   return _.merge(slackMessage, baseSlackMessage);
 };
+var handleGuardDuty = function(event, context) {
+    var subject   = "GuardDuty";
+    var message   = event.Records[0].Sns.Message
+    var timestamp = (new Date(event.Records[0].Sns.Timestamp)).getTime()/1000;
+
+    // TODO: grok "severity X" from Message and use that for color
+    var color = "warning";
+
+    // TODO: grok "Details: <link>" out of message and attach as link
+    var slackMessage = {
+        text: "*" + subject + "*",
+        attachments: [
+            {
+                "color": color,
+                "fields": [
+                    {
+                        "title": "Content",
+                        "value": message,
+                        "short": false
+                    }
+                ],
+                "ts":  timestamp
+            }
+        ]
+    };
+    return _.merge(slackMessage, baseSlackMessage);
+
+"Records": [
+        {
+            "EventSource": "aws:sns",
+            "EventVersion": "1.0",
+            "EventSubscriptionArn": "arn:aws:sns:us-west-2:308505719561:GuardDuty_Notifications:aa6d6b3f-ef05-49ec-99fa-a93d15f2f409",
+            "Sns": {
+                "Type": "Notification",
+                "MessageId": "9b6357c4-9489-5a71-9632-0c0d02c1e159",
+                "TopicArn": "arn:aws:sns:us-west-2:308505719561:GuardDuty_Notifications",
+                "Subject": null,
+                "Message": "\"AWS 308505719561 has a severity 2 GuardDuty finding type Policy:S3/BucketBlockPublicAccessDisabled in the us-west-2 region.\"\n\"Finding Description: Amazon S3 Block Public Access was disabled for S3 bucket poc-dev-blob-jm7b by md-provisioner calling DeleteBucketPublicAccessBlock. If this behavior is not expected, it may indicate a configuration mistake or that your credentials are compromised..\"\n\"Details: https://console.aws.amazon.com/guardduty/home?region=us-west-2#/findings?search=id=2ac1e722bd03d8bff7904a06dae4868b\"                 ",
+                "Timestamp": "2022-10-19T06:07:04.640Z",
+                "SignatureVersion": "1",
+                "Signature": "vh3UXZDbO25CtD5HU+0aGDSlUnUmUeZl26AaNk5dA+J4gxokNzcztospi3uTK7/Exciw3zeDssYFA01PqgDX8XYOBir8qW4h6a0nq+hojrzSWmoDXvPHn6TzZ5JG7tA3IbWnrKvYnBjxb+1xCpEBDmdmQP1PNOarr4kxjtTvZCMoXCn34xmfvV5gXMxZbBPmI6Qwu7Dy/ArfLqGq0ms+wSgo4Eag+pWyNWe/xmp7jnJHR3I9hBxl4Ojr/1JYUUIzZudSMOzExxIDDAFo4NM/ONkLeTxlVFwRQj/6txub/wElRJxM4Jvkiz9IrQTeTk+rOkX8+qPHwIUB6ico6AfHZQ==",
+                "SigningCertUrl": "https://sns.us-west-2.amazonaws.com/SimpleNotificationService-56e67fcb41f6fec09b0196692625d385.pem",
+                "UnsubscribeUrl": "https://sns.us-west-2.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-west-2:308505719561:GuardDuty_Notifications:aa6d6b3f-ef05-49ec-99fa-a93d15f2f409",
+                "MessageAttributes": {}
+            }
+        }
+        ]
+*/
+/*
+}
 */
 var handleCloudWatch = function(event, context) {
   var subject   = "CloudWatch";
@@ -375,6 +425,9 @@ var processEvent = function(event, context) {
     console.log("processing cloudwatch notification");
 */
     slackMessage = handleCloudWatch(event,context);
+    /* TODO: handleGuardDuty */
+
+
     /*
   }
   else if(eventSubscriptionArn.indexOf(config.services.codedeploy.match_text) > -1 || eventSnsSubject.indexOf(config.services.codedeploy.match_text) > -1 || eventSnsMessageRaw.indexOf(config.services.codedeploy.match_text) > -1){
